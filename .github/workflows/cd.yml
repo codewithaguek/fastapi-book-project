@@ -20,5 +20,6 @@ jobs:
           pip install -r requirements.txt
       - name: Deploy Application
         run: |
-          # Add deployment steps here (e.g., deploying to a server or cloud platform"
+          # Add deployment steps here (e.g., deploying to a server or cloud platform)
+          echo "Deployment steps go here"
           
