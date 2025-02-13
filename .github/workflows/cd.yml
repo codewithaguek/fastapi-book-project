@@ -8,18 +8,38 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with: 
           python-version: "3.9"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Set up SSH key for deployment
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Deploy Application
         run: |
-          # Add deployment steps here (e.g., deploying to a server or cloud platform)
-          echo "Deployment steps go here"
-          
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Navigate to the project directory
+            cd /path/to/your/project
+            
+            # Pull the latest changes from the main branch (if using Git)
+            git pull origin main
+
+            # Install dependencies
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+
+            # Restart the app or server service (e.g., using systemd or supervisor)
+            sudo systemctl restart yourapp.service
+          EOF
