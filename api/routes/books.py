@@ -72,11 +72,3 @@ async def get_book(book_id: int) -> Book:
         status_code=status.HTTP_200_OK, content=book.model_dump()
     )
 
-@router.get("/{book_id}", response_model=Book, status_code=status.HTTP_200_OK)
-async def get_kitab(book_id: int) -> Book:
-    book = db.get_book(book_id)
-    if book is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
-    return JSONResponse(
-        status_code=status.HTTP_200_OK, content=book.model_dump()
-    )
