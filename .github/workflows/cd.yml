@@ -12,16 +12,25 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up DigitalOcean CLI (doctl)
-        run: |
-          curl -sSL https://github.com/digitalocean/doctl/releases/download/v1.86.0/doctl-1.86.0-linux-amd64.tar.gz | tar xz
-          sudo mv doctl /usr/local/bin
-          doctl version
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
 
-      - name: Authenticate to DigitalOcean API
+      - name: Install dependencies
         run: |
-          echo "${{ secrets.DO_API_TOKEN }}" | doctl auth init -t
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Deploy Application to DigitalOcean
+      - name: Set up DigitalOcean API token
         run: |
-          doctl apps create --spec .do/app.yaml  # Modify with your app's spec or deploy command
+          echo "${{ secrets.DO_API_TOKEN }}" > ~/.do_token
+          chmod 600 ~/.do_token
+        env:
+          DO_API_TOKEN: ${{ secrets.DO_API_TOKEN }}
+
+      - name: Deploy Application to DigitalOcean App Platform
+        run: |
+          doctl auth init --access-token $DO_API_TOKEN
+          # Assuming you have your app.yaml or deployment specs
+          doctl apps create --spec .do/app.yaml
