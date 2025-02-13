@@ -3,18 +3,18 @@ name: CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger on push to main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3  # Checkout the repository
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
-        with:
+        with: 
           python-version: "3.9"
 
       - name: Install dependencies
@@ -25,24 +25,15 @@ jobs:
       - name: Set up SSH key for deployment
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Ensure main branch is up to date with remote
-        run: |
-          # Fetch latest changes from remote
-          git fetch origin
-          # Checkout the main branch
-          git checkout main
-          # Merge with origin/main automatically (resolves conflicts automatically)
-          git merge origin/main --no-edit || true
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Reference the secret correctly
 
       - name: Deploy Application
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             # Navigate to the project directory
             cd /path/to/your/project
-
-            # Pull the latest changes from the main branch
+            
+            # Pull the latest changes from the main branch (if using Git)
             git pull origin main
 
             # Install dependencies
